@@ -185,7 +185,7 @@ procedure initialiserSolutions(idJr: integer);
    Cette procedure définit aléatoirement la position des navires d'un joueur
     TODO: Réaliser l'algo aléatoire.
 *)
-var sens,xDebut,yDebut,i,j,k: integer;
+var sens,x1,y1,tailleNavire,casesVides,i,j,k: integer;
 begin
   if (idJr = 1) then //Joueur 1: Ordinateur
      begin
@@ -214,34 +214,61 @@ begin
           // Code: 4
           resolutionOrdi[8,3] := 4;
           resolutionOrdi[8,4] := 4; *)
-          randomize;
-          sens := random(1);
 
-          if (sens=1) then       // Vertical
-          begin
-            xDebut:=random(6)+1;
-            yDebut:=1;
-            for i:=0 to 4 do
-            begin
-              j:=xDebut+i;
-              k:=yDebut;
-              resolutionOrdi[xDebut,yDebut+i]:=1;
-            end;
-          end
-          else if (sens=0) then //  Horizontal
-          begin
-            xDebut:=1;
-            yDebut:=random(6)+1;
-            for i:=0 to 4 do
-            begin
-              resolutionOrdi[xDebut+i,yDebut]:=1;
-            end;
-          end;
 
+          for k:=0 to 3 do
+          begin
+            randomize;
+            sens := random(2);
+            tailleNavire:=5-k;
+
+            if (sens=0) then
+            begin
+
+            while (casesVides<>(tailleNavire+1)*3+3) do
+            begin
+              casesVides:=0;
+              randomize;
+              y1:=(random(5)+1)*2;
+              randomize;
+              x1:=random(tailleNavire+1)+1;
+
+              for j:=y1-1 to y1+1 do
+              for i:=x1-1 to x1+tailleNavire do
+              if resolutionOrdi[i,j]=0 then casesVides:=casesVides+1;
+
+             // if (resolutionOrdi[x1-1,y1]=0) and (resolutionOrdi[x1+tailleNavire,y1]=0) then casesVides:=casesVides+2;
+            end;
+
+            for i:=0 to tailleNavire-1 do resolutionOrdi[x1+i,y1]:=k+1;
+
+            end
+            else
+            begin
+
+            while (casesVides<>(tailleNavire+1)*3+3) do
+            begin
+              casesVides:=0;
+              randomize;
+              y1:=random(tailleNavire+1)+1;
+              randomize;
+              x1:=(random(5)+1)*2;
+
+              for j:=y1-1 to y1+tailleNavire do
+              for i:=x1-1 to x1+1 do
+              if resolutionOrdi[i,j]=0 then casesVides:=casesVides+1;
+
+              //if (resolutionOrdi[x1,y1-1]=0) and (resolutionOrdi[x1,y1+tailleNavire]=0) then casesVides:=casesVides+2;
+            end;
+
+            for i:=0 to tailleNavire-1 do resolutionOrdi[x1,y1+i]:=k+1;
+
+            end;
+        end;
      end
      else if (idJr = 0) then  // Joueur 0: Joueur Réel
      begin
-          // Définition du Porte-Avions (5 Cases)
+         (* // Définition du Porte-Avions (5 Cases)
           // Code: 1
           resolutionJoueur[1,1] := 1;
           resolutionJoueur[2,1] := 1;
@@ -265,7 +292,58 @@ begin
           // Définition du Torpilleur (2 Cases)
           // Code: 4
           resolutionJoueur[8,3] := 4;
-          resolutionJoueur[8,4] := 4;
+          resolutionJoueur[8,4] := 4;*)
+
+          for k:=0 to 3 do
+          begin
+            randomize;
+            sens := random(2);
+            tailleNavire:=5-k;
+
+            if (sens=0) then
+            begin
+
+            while (casesVides<>(tailleNavire+1)*3+3) do
+            begin
+              casesVides:=0;
+              randomize;
+              y1:=(random(5)+1)*2;
+              randomize;
+              x1:=random(tailleNavire+1)+1;
+
+              for j:=y1-1 to y1+1 do
+              for i:=x1-1 to x1+tailleNavire do
+              if resolutionJoueur[i,j]=0 then casesVides:=casesVides+1;
+
+              //if (resolutionJoueur[x1-1,y1]=0) and (resolutionJoueur[x1+tailleNavire,y1]=0) then casesVides:=casesVides+2;
+            end;
+
+            for i:=0 to tailleNavire-1 do resolutionJoueur[x1+i,y1]:=k+1;
+
+            end
+            else
+            begin
+
+            while (casesVides<>(tailleNavire+1)*3+3) do
+            begin
+              casesVides:=0;
+              randomize;
+              y1:=random(tailleNavire+1)+1;
+              randomize;
+              x1:=(random(5)+1)*2;
+
+              for j:=y1-1 to y1+tailleNavire do
+              for i:=x1-1 to x1+1 do
+              if resolutionJoueur[i,j]=0 then casesVides:=casesVides+1;
+
+              //if (resolutionJoueur[x1,y1-1]=0) and (resolutionJoueur[x1,y1+tailleNavire]=0) then casesVides:=casesVides+2;
+            end;
+
+            for i:=0 to tailleNavire-1 do resolutionJoueur[x1,y1+i]:=k+1;
+
+            end;
+          end;
+
      end;
 
 end;
