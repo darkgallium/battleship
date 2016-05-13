@@ -11,6 +11,7 @@ const
 var
   plateauOrdi,plateauJoueur : array [1..10,1..10] of integer;
   resolutionOrdi,resolutionJoueur : array [1..10,1..10] of integer;
+  //etat,compteur: integer =0;
 
 
 // Procedures et fonctions concernant l'affichage graphique
@@ -25,12 +26,23 @@ procedure ObtenirCoordTableau(var xSouris,ySouris,posCol,posLig: integer);
 procedure initialiserSolutions(idJr: integer);
 procedure verifierCase(idJr,posCol,posLig: integer);
 
+// Functions Outils
+function estDansTableau(i,j:integer): boolean; // Vérifie les dépassements de Tableaux
+
 implementation
 
 uses
   Windows, Messages, SysUtils, Classes,
   FPrincipale,FSolution,FCible;
 
+
+function estDansTableau(i,j:integer): boolean;
+begin
+ if (i<1) or (i>10) then Result:=False
+ else if (j<1) or (j>10) then Result:=False
+ else Result:=True;
+
+end;
 
 procedure afficherTouche(idJr,posCol,posLig: integer);
 var Image: TImage;
@@ -186,163 +198,126 @@ procedure initialiserSolutions(idJr: integer);
     TODO: Réaliser l'algo aléatoire.
 *)
 var sens,x1,y1,tailleNavire,casesVides,i,j,k: integer;
+
 begin
-  if (idJr = 1) then //Joueur 1: Ordinateur
-     begin
-          (*// Définition du Porte-Avions (5 Cases)
-          // Code: 1
-          resolutionOrdi[2,2] := 1;
-          resolutionOrdi[2,3] := 1;
-          resolutionOrdi[2,4] := 1;
-          resolutionOrdi[2,5] := 1;
-          resolutionOrdi[2,6] := 1;
+  if (idJr = 1) then
+     begin // begin du selcteur de joueur
+     randomize;
+     for k:=0 to 3 do
+     begin  // begin du for pour chaque navire
+       sens := random(2);
+       tailleNavire:=5-k;
 
-          // Définition du Croiseur (4 Cases)
-          // Code: 2
-          resolutionOrdi[4,1] := 2;
-          resolutionOrdi[5,1] := 2;
-          resolutionOrdi[6,1] := 2;
-          resolutionOrdi[7,1] := 2;
+       if (sens=0) then
+       begin
+         while (casesVides<>(tailleNavire+1)*3+3) do
+         begin
+           casesVides:=0;
+           y1:=random(10)+1;
+           x1:=random(tailleNavire+1)+1;
 
-          // Définition du Sous-Marin (3 Cases)
-          // Code: 3
-          resolutionOrdi[7,8] := 3;
-          resolutionOrdi[8,8] := 3;
-          resolutionOrdi[9,8] := 3;
+           for j:=y1-1 to y1+1 do
+           for i:=x1-1 to x1+tailleNavire do
+           begin
+             if (estDansTableau(i,j)=true) then
+             begin
+               if resolutionOrdi[i,j]=0 then casesVides:=casesVides+1
+               else casesVides:=casesVides-1;
+             end
+             else casesVides:=casesVides+1;
+           end;
 
-          // Définition du Torpilleur (2 Cases)
-          // Code: 4
-          resolutionOrdi[8,3] := 4;
-          resolutionOrdi[8,4] := 4; *)
+         end;
 
+         for i:=0 to tailleNavire-1 do resolutionOrdi[x1+i,y1]:=k+1;
 
-          for k:=0 to 3 do
-          begin
-            randomize;
-            sens := random(2);
-            tailleNavire:=5-k;
+       end
+       else
+         begin
+           while (casesVides<>(tailleNavire+1)*3+3) do
+           begin
+             casesVides:=0;
+             y1:=random(tailleNavire+1)+1;
+             x1:=random(10)+1;
 
-            if (sens=0) then
-            begin
+             for j:=y1-1 to y1+tailleNavire do
+             for i:=x1-1 to x1+1 do
+             begin
+               if (estDansTableau(i,j)=true) then
+               begin
+                 if resolutionOrdi[i,j]=0 then casesVides:=casesVides+1
+                 else casesVides:=casesVides-1;
+               end
+               else casesVides:=casesVides+1;
+             end;
 
-            while (casesVides<>(tailleNavire+1)*3+3) do
-            begin
-              casesVides:=0;
-              randomize;
-              y1:=(random(5)+1)*2;
-              randomize;
-              x1:=random(tailleNavire+1)+1;
+           end;
 
-              for j:=y1-1 to y1+1 do
-              for i:=x1-1 to x1+tailleNavire do
-              if resolutionOrdi[i,j]=0 then casesVides:=casesVides+1;
+           for i:=0 to tailleNavire-1 do resolutionOrdi[x1,y1+i]:=k+1;
 
-             // if (resolutionOrdi[x1-1,y1]=0) and (resolutionOrdi[x1+tailleNavire,y1]=0) then casesVides:=casesVides+2;
-            end;
+         end;
 
-            for i:=0 to tailleNavire-1 do resolutionOrdi[x1+i,y1]:=k+1;
+       end;
 
-            end
-            else
-            begin
-
-            while (casesVides<>(tailleNavire+1)*3+3) do
-            begin
-              casesVides:=0;
-              randomize;
-              y1:=random(tailleNavire+1)+1;
-              randomize;
-              x1:=(random(5)+1)*2;
-
-              for j:=y1-1 to y1+tailleNavire do
-              for i:=x1-1 to x1+1 do
-              if resolutionOrdi[i,j]=0 then casesVides:=casesVides+1;
-
-              //if (resolutionOrdi[x1,y1-1]=0) and (resolutionOrdi[x1,y1+tailleNavire]=0) then casesVides:=casesVides+2;
-            end;
-
-            for i:=0 to tailleNavire-1 do resolutionOrdi[x1,y1+i]:=k+1;
-
-            end;
-        end;
      end
      else if (idJr = 0) then  // Joueur 0: Joueur Réel
-     begin
-         (* // Définition du Porte-Avions (5 Cases)
-          // Code: 1
-          resolutionJoueur[1,1] := 1;
-          resolutionJoueur[2,1] := 1;
-          resolutionJoueur[3,1] := 1;
-          resolutionJoueur[4,1] := 1;
-          resolutionJoueur[5,1] := 1;
+     begin // begin du selcteur de joueur
+     randomize;
+     for k:=0 to 3 do
+     begin  // begin du for pour chaque navire
+       sens := random(2);
+       tailleNavire:=5-k;
 
-          // Définition du Croiseur (4 Cases)
-          // Code: 2
-          resolutionJoueur[6,6] := 2;
-          resolutionJoueur[6,5] := 2;
-          resolutionJoueur[6,4] := 2;
-          resolutionJoueur[6,3] := 2;
+       if (sens=0) then
+       begin
+         while (casesVides<>(tailleNavire+1)*3+3) do
+         begin
+           casesVides:=0;
+           y1:=random(10)+1;
+           x1:=random(tailleNavire+1)+1;
 
-          // Définition du Sous-Marin (3 Cases)
-          // Code: 3
-          resolutionJoueur[7,8] := 3;
-          resolutionJoueur[8,8] := 3;
-          resolutionJoueur[9,8] := 3;
+           for j:=y1-1 to y1+1 do
+           for i:=x1-1 to x1+tailleNavire do
+           begin
+             if (estDansTableau(i,j)=true) then
+             begin
+               if resolutionJoueur[i,j]=0 then casesVides:=casesVides+1
+               else casesVides:=casesVides-1;
+             end
+             else casesVides:=casesVides+1;
+           end;
 
-          // Définition du Torpilleur (2 Cases)
-          // Code: 4
-          resolutionJoueur[8,3] := 4;
-          resolutionJoueur[8,4] := 4;*)
+         end;
 
-          for k:=0 to 3 do
-          begin
-            randomize;
-            sens := random(2);
-            tailleNavire:=5-k;
+         for i:=0 to tailleNavire-1 do resolutionJoueur[x1+i,y1]:=k+1;
 
-            if (sens=0) then
-            begin
+       end
+       else
+         begin
+           while (casesVides<>(tailleNavire+1)*3+3) do
+           begin
+             casesVides:=0;
+             y1:=random(tailleNavire+1)+1;
+             x1:=random(10)+1;
 
-            while (casesVides<>(tailleNavire+1)*3+3) do
-            begin
-              casesVides:=0;
-              randomize;
-              y1:=(random(5)+1)*2;
-              randomize;
-              x1:=random(tailleNavire+1)+1;
+             for j:=y1-1 to y1+tailleNavire do
+             for i:=x1-1 to x1+1 do
+             begin
+               if (estDansTableau(i,j)=true) then
+               begin
+                 if resolutionJoueur[i,j]=0 then casesVides:=casesVides+1
+                 else casesVides:=casesVides-1;
+               end
+               else casesVides:=casesVides+1;
+             end;
 
-              for j:=y1-1 to y1+1 do
-              for i:=x1-1 to x1+tailleNavire do
-              if resolutionJoueur[i,j]=0 then casesVides:=casesVides+1;
+           end;
 
-              //if (resolutionJoueur[x1-1,y1]=0) and (resolutionJoueur[x1+tailleNavire,y1]=0) then casesVides:=casesVides+2;
-            end;
+           for i:=0 to tailleNavire-1 do resolutionJoueur[x1,y1+i]:=k+1;
 
-            for i:=0 to tailleNavire-1 do resolutionJoueur[x1+i,y1]:=k+1;
+         end;
 
-            end
-            else
-            begin
-
-            while (casesVides<>(tailleNavire+1)*3+3) do
-            begin
-              casesVides:=0;
-              randomize;
-              y1:=random(tailleNavire+1)+1;
-              randomize;
-              x1:=(random(5)+1)*2;
-
-              for j:=y1-1 to y1+tailleNavire do
-              for i:=x1-1 to x1+1 do
-              if resolutionJoueur[i,j]=0 then casesVides:=casesVides+1;
-
-              //if (resolutionJoueur[x1,y1-1]=0) and (resolutionJoueur[x1,y1+tailleNavire]=0) then casesVides:=casesVides+2;
-            end;
-
-            for i:=0 to tailleNavire-1 do resolutionJoueur[x1,y1+i]:=k+1;
-
-            end;
-          end;
+       end;
 
      end;
 
