@@ -190,7 +190,7 @@ end;
 procedure verifierEnVue(idJr,posCol,posLig: integer);
 var i,j,n: integer;
 begin
-
+n:=0;
 
   if (idJr=0) then
   begin
@@ -370,8 +370,9 @@ begin
     scoreOrdi:=scoreOrdi-250*(1-resolutionJoueur[posCol,posLig])+1000;
     plateauOrdi[posCol,posLig]:=resolutionJoueur[posCol,posLig];
     verifierCoule(1,posCol,posLig);
+
     yToucheOrdi:=posLig;
-   xToucheOrdi:=posCol;
+    xToucheOrdi:=posCol;
    end
    else
    begin
