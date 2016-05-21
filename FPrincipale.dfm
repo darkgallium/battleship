@@ -159,6 +159,13 @@ object Form2: TForm2
     Font.Style = []
     ParentFont = False
   end
+  object Label9: TLabel
+    Left = 240
+    Top = 152
+    Width = 545
+    Height = 17
+    Caption = 'Label9'
+  end
   object Button1: TButton
     Left = 8
     Top = 152
@@ -180,6 +187,7 @@ object Form2: TForm2
     OnClick = Button2Click
   end
   object Timer1: TTimer
+    OnTimer = Timer1Timer
     Left = 160
     Top = 8
   end

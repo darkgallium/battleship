@@ -24,10 +24,12 @@ type
     TitreEtat: TLabel;
     DescrEtat: TLabel;
     Timer3: TTimer;
+    Label9: TLabel;
     procedure FormCreate(Sender: TObject);
     procedure Timer2Timer(Sender: TObject);
     procedure Button2Click(Sender: TObject);
     procedure FormKeyPress(Sender: TObject; var Key: Char);
+    procedure Timer1Timer(Sender: TObject);
 
   private
     { Déclarations privées }
@@ -114,6 +116,11 @@ begin
     tour:=tour+1;
     afficherEtat('A vous de jouer, Florian','Choisissez une case');
   end;
+end;
+
+procedure TForm2.Timer1Timer(Sender: TObject);
+begin
+  Label9.Caption:='DEBUG : situationOrd:'+IntToStr(situationOrdi)+' xTouche:'+IntToStr(xToucheOrdi)+' yTouche:'+IntToStr(yToucheOrdi);
 end;
 
 end.

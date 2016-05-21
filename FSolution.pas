@@ -45,6 +45,7 @@ procedure TForm1.FormCreate(Sender: TObject);
 begin
       genererEcran(Form1.Image1);
       initialiserSolutions(0);initialiserSolutions(1);
+      initialiserCible(0);initialiserCible(1);
       afficherSolutions(Form1.Image1,0);
 end;
 
