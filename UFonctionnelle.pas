@@ -11,23 +11,37 @@ const
 var
   plateauOrdi,plateauJoueur : array [1..10,1..10] of integer;
   resolutionOrdi,resolutionJoueur : array [1..10,1..10] of integer;
-  //etat,compteur: integer =0;
+  joueurQuiJoue,chrono,tour,etat,scoreOrdi,scoreJoueur,situationOrdi,xToucheOrdi,yToucheOrdi: integer;
+  sensTeste: integer =0;
+  compteurTouche: integer =0;
+  jeuEnPause,touchePress: boolean;
 
 
 // Procedures et fonctions concernant l'affichage graphique
 
 procedure afficherSolutions(Image: TImage;idJr: integer);
 procedure afficherTouche(idJr,posCol,posLig: integer);
+procedure afficherDansEau(idJr,posCol,posLig: integer);
+procedure noircirEcran(Image: TImage);
 procedure genererEcran(Image: TImage);
 procedure ObtenirCoordTableau(var xSouris,ySouris,posCol,posLig: integer);
+procedure afficherEtat(titre,description: string);
 
 // Procedures et fonctions concernant l'algorithme de jeu
 
 procedure initialiserSolutions(idJr: integer);
+procedure initialiserCible(idJr: integer);
+procedure trouverCase(var x,y: integer);
+procedure verifierEnVue(idJr,posCol,posLig: integer);
+procedure verifierCoule(idJr,posCol,posLig: integer);
 procedure verifierCase(idJr,posCol,posLig: integer);
 
 // Functions Outils
 function estDansTableau(i,j:integer): boolean; // Vérifie les dépassements de Tableaux
+
+
+
+
 
 implementation
 
@@ -43,6 +57,14 @@ begin
  else Result:=True;
 
 end;
+
+procedure afficherEtat(titre,description: string);
+begin
+  Form2.TitreEtat.Caption:=titre;
+  Form2.DescrEtat.Caption:=description;
+
+end;
+
 
 procedure afficherTouche(idJr,posCol,posLig: integer);
 var Image: TImage;
@@ -62,34 +84,310 @@ begin
     Image.Canvas.Pen.Style:= psClear;
     Image.Canvas.FillRect(caseTouchee);
 
+  end
+  else
+  begin
+    Image:=Form1.Image1;
+
+    caseTouchee.Left:=21+(posCol-1)*40; // Marge de 20px + 1px pour laisser la bordure visible
+    caseTouchee.Right:=20+posCol*40;
+    caseTouchee.Top:=21+(posLig-1)*40;
+    caseTouchee.Bottom:=20+posLig*40;
+
+    Image.Canvas.Brush.Color:= clGray;
+    Image.Canvas.Brush.Style:= bsSolid;
+    Image.Canvas.Pen.Style:= psClear;
+    Image.Canvas.FillRect(caseTouchee);
 
   end;
 end;
 
-procedure verifierCase(idJr,posCol,posLig: integer);
+procedure afficherDansEau(idJr,posCol,posLig: integer);
+var Image: TImage;
+    caseTouchee:tRect;
+begin
+  if (idJr=0) then
+  begin
+    Image:=Form3.Image1;
 
+    caseTouchee.Left:=21+(posCol-1)*40; // Marge de 20px + 1px pour laisser la bordure visible
+    caseTouchee.Right:=20+posCol*40;
+    caseTouchee.Top:=21+(posLig-1)*40;
+    caseTouchee.Bottom:=20+posLig*40;
+
+    Image.Canvas.Brush.Color:= clTeal;
+    Image.Canvas.Brush.Style:= bsSolid;
+    Image.Canvas.Pen.Style:= psClear;
+    Image.Canvas.FillRect(caseTouchee);
+
+  end
+  else
+  begin
+    Image:=Form1.Image1;
+
+    caseTouchee.Left:=21+(posCol-1)*40; // Marge de 20px + 1px pour laisser la bordure visible
+    caseTouchee.Right:=20+posCol*40;
+    caseTouchee.Top:=21+(posLig-1)*40;
+    caseTouchee.Bottom:=20+posLig*40;
+
+    Image.Canvas.Brush.Color:= clGray;
+    Image.Canvas.Brush.Style:= bsSolid;
+    Image.Canvas.Pen.Style:= psClear;
+    Image.Canvas.FillRect(caseTouchee);
+
+  end;
+end;
+
+
+procedure verifierCoule(idJr,posCol,posLig: integer);
+var i,j,n: integer;
+begin
+n:=0;
+  if (idJr=0) then
+  begin
+
+    for j:=1 to 10 do
+    for i:=1 to 10 do
+    begin
+      if estDansTableau(i,j) then
+      if plateauJoueur[i,j] = resolutionOrdi[posCol,posLig] then n:=n+1;
+    end;
+
+    if (n>=6-resolutionOrdi[posCol,posLig]) then afficherEtat('Félicitations !','Vous avez coulé un navire adverse !')
+    else afficherEtat('Touché !','Votre coup à touché un navire adverse !');
+
+  end
+  else
+  begin
+
+    for j:=1 to 10 do
+    for i:=1 to 10 do
+    begin
+      if estDansTableau(i,j) then
+      if plateauOrdi[i,j] = resolutionJoueur[posCol,posLig] then n:=n+1;
+    end;
+
+    if (n>=6-resolutionOrdi[posCol,posLig]) then
+    begin
+      afficherEtat('Dommage !','Votre adversaire a réussi a détruire entièrement un de vos navires !');
+      situationOrdi:=0;
+    end
+    else
+    begin
+      afficherEtat('Attention !','Votre adversaire a porté un coup à votre navire !');
+      compteurTouche:=compteurTouche+1;
+      situationOrdi:=1;
+
+    end;
+
+  end;
+
+end;
+
+
+
+
+procedure verifierEnVue(idJr,posCol,posLig: integer);
+var i,j,n: integer;
+begin
+n:=0;
+
+  if (idJr=0) then
+  begin
+
+    for j:=posLig-1 to posLig+1 do
+    for i:=posCol-1 to posCol+1 do
+    begin
+      if estDansTableau(i,j) then
+      if resolutionOrdi[i,j] <> 0 then n:=n+1;
+    end;
+
+    if n>1 then afficherEtat('En Vue !','Votre coup était proche d''un navire adverse')
+    else afficherEtat('Dans l''eau !','Votre coup a raté la cible...');
+
+  end
+  else
+  begin
+
+    for j:=posLig-1 to posLig+1 do
+    for i:=posCol-1 to posCol+1 do
+    begin
+      if estDansTableau(i,j) then
+      if resolutionJoueur[i,j] <> 0 then n:=n+1;
+    end;
+
+    if n>1 then
+    begin
+      afficherEtat('Prudence !','Le coup de votre adversaire était proche d''un de vos navires');
+      situationOrdi:=3;
+      yToucheOrdi:=posLig;
+      xToucheOrdi:=posCol;
+    end
+    else
+    begin
+      afficherEtat('Ouf !','Votre adversaire a raté la cible...');
+      situationOrdi:=0;
+    end;
+
+  end;
+
+end;
+
+procedure trouverCase(var x,y: integer);
+begin
+//randomize;
+
+  if (tour=1) or (situationOrdi=0) then // si premier tour ou coulé ou dans l'eau
+  begin
+    x:=random(10)+1;
+    y:=random(10)+1;
+  end
+
+  else if (situationOrdi=1) then // si navire touché ou proche, trouver sens
+  begin
+    if (compteurTouche=1) then
+    begin
+      while (estDansTableau(x,y)=false) do
+      begin
+        sensTeste:=sensTeste+1;
+
+        case sensTeste of
+          1: begin
+		          y:=yToucheOrdi-1;
+		          x:=xToucheOrdi;
+		      end;
+		      2: begin
+		          y:=yToucheOrdi;
+		          x:=xToucheOrdi+1;
+		      end;
+		      3: begin
+		          y:=yToucheOrdi;
+		          x:=xToucheOrdi-1;
+		      end;
+		      4: begin
+		          y:=yToucheOrdi+1;
+		          x:=xToucheOrdi;
+		      end;
+		      else situationOrdi:=0;
+		    end;
+
+      end;
+    end
+    else
+    begin
+    while (estDansTableau(x,y)=false) do
+      begin
+      case sensTeste of
+          1: begin
+		          y:=yToucheOrdi-1;
+		          x:=xToucheOrdi;
+		      end;
+		      2: begin
+		          y:=yToucheOrdi;
+		          x:=xToucheOrdi+1;
+		      end;
+		      3: begin
+		          y:=yToucheOrdi;
+		          x:=xToucheOrdi-1;
+		      end;
+		      4: begin
+		          y:=yToucheOrdi+1;
+		          x:=xToucheOrdi;
+		      end;
+		      else situationOrdi:=0;
+		    end;
+    end;
+    end;
+  end
+
+  else if (situationOrdi=3) then
+  begin
+  sensTeste:=0;
+  while (estDansTableau(x,y)=false) do
+      begin
+        sensTeste:=sensTeste+1;
+
+        case sensTeste of
+          1: begin
+		          y:=yToucheOrdi-1;
+		          x:=xToucheOrdi;
+		      end;
+		      2: begin
+		          y:=yToucheOrdi;
+		          x:=xToucheOrdi+1;
+		      end;
+		      3: begin
+		          y:=yToucheOrdi;
+		          x:=xToucheOrdi-1;
+		      end;
+		      4: begin
+		          y:=yToucheOrdi+1;
+		          x:=xToucheOrdi;
+		      end;
+		      else situationOrdi:=0;
+		    end;
+
+      end;
+
+  end;
+
+  verifierCase(1,x,y);
+
+end;
+
+procedure verifierCase(idJr,posCol,posLig: integer);
+var i,j: integer;
+    n: integer;
 begin
 
   if (idJr=0) then
   begin
-    case resolutionOrdi[posCol,posLig] of
-//TODO: Vérifier si en vue, sinon dans l'eau
-      1: begin
-        afficherTouche(0,posCol,posLig);
-      end;
-     (* 2:
-      3:
-      4:*)
-      end;
+
+  if (resolutionOrdi[posCol,posLig] in [1..4]) then  // si touché
+   begin
+    afficherTouche(0,posCol,posLig);
+    scoreJoueur:=scoreOrdi-250*(1-resolutionOrdi[posCol,posLig])+1000;
+    plateauJoueur[posCol,posLig]:=resolutionOrdi[posCol,posLig];
+    verifierCoule(0,posCol,posLig);
+   end
+   else
+   begin
+    verifierEnVue(0,posCol,posLig);
+    afficherDansEau(0,posCol,posLig);
+   end;
+
+    etat:=1;
+
+  end
+  else
+  begin
+  n:=0;
+
+
+   if (resolutionJoueur[posCol,posLig] in [1..4]) then  // si touché
+   begin
+    afficherTouche(1,posCol,posLig);
+    scoreOrdi:=scoreOrdi-250*(1-resolutionJoueur[posCol,posLig])+1000;
+    plateauOrdi[posCol,posLig]:=resolutionJoueur[posCol,posLig];
+    verifierCoule(1,posCol,posLig);
+
+    yToucheOrdi:=posLig;
+    xToucheOrdi:=posCol;
+   end
+   else
+   begin
+    afficherDansEau(1,posCol,posLig);
+    verifierEnVue(1,posCol,posLig);
+   end;
+
+   etat:=2;
+
   end;
-  //else ;
 
 end;
 
 procedure afficherSolutions(Image: TImage;
                             idJr: integer);
-(* Procedure initialiserJeu
-   Cette procedure affiche le jeu complet (résolu) généré préalablement d'un joueur donné *)
 
 var i,j: integer; // Compteurs de boucles locaux
     caseColoree: tRect;
@@ -137,22 +435,23 @@ begin
 
 end;
 
-
+procedure noircirEcran(Image: TImage);
+begin
+  Image.Canvas.Pen.Color:=clBlack;
+  Image.Canvas.Brush.Color:=clBlack;
+  Image.Canvas.rectangle(0,0,Image.Width,Image.Height); //Arrière-plan de la fenêtre noir
+end;
 
 procedure genererEcran(Image: TImage);
 (* Procedure genererEcran
-   Cette procedure génere un fond de fenêtre bleu foncé,
    trace la grille et affiche les étiquettes de cases
    (de A à J horizontalement et de 1 à 10 verticalement) *)
 
 var i,j: integer; // Compteurs de boucles locaux
 begin
-      Image.Canvas.Pen.Color:=clBlack;
-      Image.Canvas.Brush.Color:=clBlack;
-      Image.Canvas.rectangle(0,0,Image.Width,Image.Height); //Arrière-plan de la fenêtre noir
-
-
+      noircirEcran(Image);
       Image.Canvas.Pen.Color:=clSilver;
+
       for i:=1 to 11 do
       begin
           // On trace un trait horizontal et vertical tous les 40px, on retranche la marge de 20px dans les deux cas
@@ -195,7 +494,6 @@ end;
 procedure initialiserSolutions(idJr: integer);
 (* Procedure initialiserJeu
    Cette procedure définit aléatoirement la position des navires d'un joueur
-    TODO: Réaliser l'algo aléatoire.
 *)
 var sens,x1,y1,tailleNavire,casesVides,i,j,k: integer;
 
