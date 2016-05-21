@@ -1,6 +1,6 @@
 object Form3: TForm3
-  Left = 666
-  Top = 26
+  Left = 686
+  Top = 111
   BorderIcons = [biMinimize]
   BorderStyle = bsDialog
   Caption = 'Grille de jeu adverse'

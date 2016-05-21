@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 161
-  Top = 28
+  Left = 178
+  Top = 113
   BorderIcons = [biMinimize]
   BorderStyle = bsDialog
   Caption = 'Votre grille de jeu'
