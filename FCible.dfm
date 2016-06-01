@@ -1,6 +1,6 @@
 object Form3: TForm3
-  Left = 666
-  Top = 26
+  Left = 686
+  Top = 111
   BorderIcons = [biMinimize]
   BorderStyle = bsDialog
   Caption = 'Grille de jeu adverse'
@@ -13,7 +13,6 @@ object Form3: TForm3
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
-  Visible = True
   OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
@@ -24,5 +23,11 @@ object Form3: TForm3
     Height = 440
     Align = alClient
     OnClick = Image1Click
+  end
+  object Timer1: TTimer
+    Interval = 100
+    OnTimer = Timer1Timer
+    Left = 8
+    Top = 8
   end
 end
