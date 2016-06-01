@@ -6,7 +6,7 @@ uses Graphics,ExtCtrls;
 const
   lettres: array[0..10] of string =('0','A','B','C','D','E','F','G','H','I','J');
   couleursCasesSolution: array[0..4] of TColor = (clBlack,clRed,clGreen,clBlue,clYellow);
-  couleursCasesCible: array[0..14] of TColor = (clBlack,clWhite,clSkyBlue,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clYellow,clBlue,clGreen,clRed);
+  couleursCasesCible: array[0..14] of TColor = (clBlack,clWhite,clSkyBlue,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clRed,clGreen,clBlue,clYellow);
   navires: array[1..4] of string = ('Porte-Avions','Croiseur','Sous-Marin','Torpilleur');
 
 var
@@ -92,7 +92,7 @@ n:=0;
         for j:=1 to 10 do
         for i:=1 to 10 do
         begin
-          if (resolutionJ2[i,j]=resolutionJ2[posCol,posLig]) then plateauJ1[i,j]:=resolutionJ2[posCol,posLig]+7;
+          if (resolutionJ2[i,j]=resolutionJ2[posCol,posLig]) then plateauJ1[i,j]:=resolutionJ2[posCol,posLig]+10;
         end;
       end
       else afficherEtat('Touché !','Votre coup à touché un navire adverse !');  // TODO : Vérifier si on a déjà cliqué !!
@@ -107,7 +107,7 @@ n:=0;
         for j:=1 to 10 do
         for i:=1 to 10 do
         begin
-          if (resolutionJ1[i,j]=resolutionJ1[posCol,posLig]) then plateauJ2[i,j]:=resolutionJ1[posCol,posLig]+7;
+          if (resolutionJ1[i,j]=resolutionJ1[posCol,posLig]) then plateauJ2[i,j]:=resolutionJ1[posCol,posLig]+10;
         end;
       end
       else afficherEtat('Touché !','Votre coup à touché un navire adverse !');
