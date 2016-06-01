@@ -1,6 +1,6 @@
 object Form1: TForm1
-  Left = 161
-  Top = 28
+  Left = 178
+  Top = 113
   BorderIcons = [biMinimize]
   BorderStyle = bsDialog
   Caption = 'Votre grille de jeu'
@@ -13,8 +13,6 @@ object Form1: TForm1
   Font.Name = 'MS Sans Serif'
   Font.Style = []
   OldCreateOrder = False
-  Visible = True
-  OnCreate = FormCreate
   PixelsPerInch = 96
   TextHeight = 13
   object Image1: TImage
@@ -27,7 +25,8 @@ object Form1: TForm1
     OnDblClick = Image1DblClick
   end
   object Timer1: TTimer
-    Interval = 10000
+    Interval = 100
+    OnTimer = Timer1Timer
     Left = 24
     Top = 24
   end

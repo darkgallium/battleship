@@ -10,8 +10,10 @@ uses
 type
   TForm3 = class(TForm)
     Image1: TImage;
+    Timer1: TTimer;
     procedure FormCreate(Sender: TObject);
     procedure Image1Click(Sender: TObject);
+    procedure Timer1Timer(Sender: TObject);
   private
     { Déclarations privées }
   public
@@ -28,8 +30,8 @@ implementation
 
 procedure TForm3.FormCreate(Sender: TObject);
 begin
-    genererEcran(Form3.Image1);
-    afficherSolutions(Form3.Image1,1);
+    //genererEcran(Form3.Image1);
+    //afficherSolutions(Form3.Image1,1);
 end;
 
 procedure TForm3.Image1Click(Sender: TObject);
@@ -38,10 +40,21 @@ var
   posLig,posCol: integer;
 
 begin
-      (*posCol:=0;posLig:=0;
+
+      posCol:=0;posLig:=0;
       pointeurSouris := ScreenToClient(Mouse.CursorPos); // Obtention de la position de la souris dans la fenêtre Form1
       ObtenirCoordTableau(pointeurSouris.x,pointeurSouris.y,posCol,posLig);
-      verifierCase(0,posCol,posLig); *)
+
+      compteurActions:=compteurActions+1;
+      if (compteurActions=1) then verifierCase(joueurQuiJoue,posCol,posLig)
+      else afficherEtat('Vous avez déjà joué, J1','Veuillez à présent appuyer sur une touche')
+
+end;
+
+procedure TForm3.Timer1Timer(Sender: TObject);
+begin
+    genererEcran(Form3.Image1);
+    afficherPlateau(Form3.Image1,joueurQuiJoue);
 end;
 
 end.
