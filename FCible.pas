@@ -46,7 +46,28 @@ begin
       ObtenirCoordTableau(pointeurSouris.x,pointeurSouris.y,posCol,posLig);
 
       compteurActions:=compteurActions+1;
-      if (compteurActions=1) then verifierCase(joueurQuiJoue,posCol,posLig)
+
+      if (compteurActions=1) then
+      begin
+        if (joueurQuiJoue=1) then
+        begin
+          if (plateauJ1[posCol,posLig]=0) then verifierCase(joueurQuiJoue,posCol,posLig)
+          else
+          begin
+            afficherEtat('Vous avez déjà selectionné cette case antérieurement...','Veuillez sélectionner une autre case');
+            compteurActions:=0;
+          end;
+        end
+        else
+        begin
+          if (plateauJ2[posCol,posLig]=0) then verifierCase(joueurQuiJoue,posCol,posLig)
+          else
+          begin
+            afficherEtat('Vous avez déjà selectionné cette case antérieurement...','Veuillez sélectionner une autre case');
+            compteurActions:=0;
+          end;
+        end;
+      end
       else afficherEtat('Vous avez déjà joué, J1','Veuillez à présent appuyer sur une touche')
 
 end;

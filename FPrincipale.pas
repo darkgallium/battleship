@@ -56,6 +56,7 @@ begin
       etat:=0;
       initialiserSolutions(1);initialiserSolutions(2);
       initialiserCible(1);initialiserCible(2);
+      initialiserCompteursTouches;
       Form2.Label1.Caption:='Score de '+idVersNomJoueur(1)+' :';
       Form2.Label3.Caption:='Score de '+idVersNomJoueur(2)+' :';
 end;

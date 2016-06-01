@@ -6,21 +6,15 @@ uses Graphics,ExtCtrls;
 const
   lettres: array[0..10] of string =('0','A','B','C','D','E','F','G','H','I','J');
   couleursCasesSolution: array[0..4] of TColor = (clBlack,clRed,clGreen,clBlue,clYellow);
-  couleursCasesCible: array[0..2] of TColor = (clBlack,clWhite,clSkyBlue);
-  compteurTouchesJ1: array[1..4] of Integer = (0,0,0,0);
-  compteurTouchesJ2: array[1..4] of Integer = (0,0,0,0);
+  couleursCasesCible: array[0..14] of TColor = (clBlack,clWhite,clSkyBlue,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clBlack,clYellow,clBlue,clGreen,clRed);
   navires: array[1..4] of string = ('Porte-Avions','Croiseur','Sous-Marin','Torpilleur');
 
 var
   plateauJ1,plateauJ2 : array [1..10,1..10] of integer;
   resolutionJ1,resolutionJ2 : array [1..10,1..10] of integer;
+  compteurTouchesJ1: array[1..4] of Integer;
+  compteurTouchesJ2: array[1..4] of Integer;
   joueurQuiJoue,chrono,tour,etat,scoreJ1,scoreJ2,jeuConsulte,inter,compteurActions: integer;
-  //xTouc1,yTouc1,xTouc2,yTouc2: integer;
-  //xTest,yTest: integer;
-  //dirTouc: integer =0;
-  //dirTest: integer =0;
-  //nbTouchers: integer =0;
-  //nbCasesTest: integer =0;
   jeuEnPause: boolean;
 
 
@@ -28,8 +22,6 @@ var
 
 procedure afficherSolutions(Image: TImage;idJr: integer);
 procedure afficherPlateau(Image: TImage;idJr: integer);
-//procedure afficherTouche(idJr,posCol,posLig: integer);
-//procedure afficherDansEau(idJr,posCol,posLig: integer);
 procedure noircirEcran(Image: TImage);
 procedure genererEcran(Image: TImage);
 procedure ObtenirCoordTableau(var xSouris,ySouris,posCol,posLig: integer);
@@ -40,6 +32,7 @@ procedure afficherEtat(titre,description: string);
 function idVersNomJoueur(idJr:integer): string;
 procedure initialiserSolutions(idJr: integer);
 procedure initialiserCible(idJr: integer);
+procedure initialiserCompteursTouches;
 procedure verifierEnVue(idJr,posCol,posLig: integer);
 procedure verifierCoule(idJr,posCol,posLig: integer);
 procedure verifierCase(idJr,posCol,posLig: integer);
@@ -72,6 +65,11 @@ begin
 
 end;
 
+function verifierSiGagne(idJr:integer): boolean;
+begin
+  //TODO: Vérif si gagné !
+end;
+
 procedure afficherEtat(titre,description: string);
 begin
   Form2.TitreEtat.Caption:=titre;
@@ -81,26 +79,38 @@ end;
 
 
 procedure verifierCoule(idJr,posCol,posLig: integer);
-var i,j,n: integer;
+var n,i,j: integer;
 begin
 n:=0;
   if (idJr=1) then
   begin
       n:=resolutionJ2[posCol,posLig];
-      i:=compteurTouchesJ1[n];
-      i:=i+1;
-      if (compteurTouchesJ1[n]>=6-resolutionJ2[posCol,posLig]) then afficherEtat('Félicitations !','Vous avez coulé un navire adverse !')
-      else afficherEtat('Touché !','Votre coup à touché un navire adverse !');
+      compteurTouchesJ1[n]:=compteurTouchesJ1[n]+1;
+      if (compteurTouchesJ1[n]>=6-resolutionJ2[posCol,posLig]) then
+      begin
+        afficherEtat('Coulé !','Vous avez coulé le '+navires[resolutionJ2[posCol,posLig]]+' adverse !');
+        for j:=1 to 10 do
+        for i:=1 to 10 do
+        begin
+          if (resolutionJ2[i,j]=resolutionJ2[posCol,posLig]) then plateauJ1[i,j]:=resolutionJ2[posCol,posLig]+7;
+        end;
+      end
+      else afficherEtat('Touché !','Votre coup à touché un navire adverse !');  // TODO : Vérifier si on a déjà cliqué !!
   end
   else
   begin
     n:=resolutionJ1[posCol,posLig];
-    i:=compteurTouchesJ2[n];
-    i:=i+1;
-    compteurTouchesJ2[n]:=i;
-      if (compteurTouchesJ2[n]>=6-resolutionJ1[posCol,posLig]) then afficherEtat('Félicitations !','Vous avez coulé un navire adverse !')
+    compteurTouchesJ2[n]:=compteurTouchesJ2[n]+1;
+    if (compteurTouchesJ2[n]>=6-resolutionJ1[posCol,posLig]) then
+      begin
+        afficherEtat('Coulé !','Vous avez coulé le '+navires[resolutionJ1[posCol,posLig]]+' adverse !');
+        for j:=1 to 10 do
+        for i:=1 to 10 do
+        begin
+          if (resolutionJ1[i,j]=resolutionJ1[posCol,posLig]) then plateauJ2[i,j]:=resolutionJ1[posCol,posLig]+7;
+        end;
+      end
       else afficherEtat('Touché !','Votre coup à touché un navire adverse !');
-
   end;
 
 end;
@@ -492,6 +502,15 @@ begin
               end;
           end;
      end
+end;
+
+procedure initialiserCompteursTouches;
+var i,j: integer;
+begin
+    for j:=1 to 4 do compteurTouchesJ1[j] := 0;
+
+    for j:=1 to 4 do compteurTouchesJ2[j] := 0;
+
 end;
 
 end.
